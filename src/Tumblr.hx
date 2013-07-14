@@ -26,13 +26,29 @@ class Tumblr {
         if (cred == null){
             throw "Missing .tumblr credential file, please create one.";
         }
-        var p = new neko.io.Process(TUMBLR, ["--credentials", cred, file]);
+        var p = new neko.io.Process(TUMBLR, ["post", file]);
         if (p.exitCode() != 0)
             throw p.stderr.readAll().toString();
         var res = p.stdout.readAll().toString();
-        var reg = ~/^Published.*The ID.*is: ([0-9]+)$/;
+        var reg = ~/ID: ([0-9]+)$/;
         if (reg.match(res))
             return reg.matched(1);
         throw res;
     }
+
+    /*
+      Edit a post
+
+      Returns post ID.
+     */
+    public static function edit(file:String) : String {
+				var p = new neko.io.Process(TUMBLR, ["update", file]);
+        if (p.exitCode() != 0)
+            throw p.stderr.readAll().toString();
+        var res = p.stdout.readAll().toString();
+        var reg = ~/ID: ([0-9]+)$/;
+        if (reg.match(res))
+            return reg.matched(1);
+        throw res;
+		}
 }

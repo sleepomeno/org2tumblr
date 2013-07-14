@@ -168,7 +168,7 @@ class App {
         yaml("tags", node.tags.join(", "));
         yaml("format", "html");
         if (id != null)
-            yaml("post-id", id);
+            yaml("id", id);
         yaml("state", /* draft, queu, submission, published */
         switch (node.state){
             case "TODO": "draft";
@@ -197,8 +197,13 @@ class App {
         var out = neko.io.File.write(TMP_FILE,true);
         out.writeString(buf.toString());
         out.close();
-        id = Tumblr.post(TMP_FILE, cred);
-        neko.Lib.println("Synchronizing \""+node.title+"\"");
+				if(id == null) {
+			        id = Tumblr.post(TMP_FILE, cred);
+        			neko.Lib.println("Creating \""+node.title+"\"");
+				} else {
+        		neko.Lib.println("Editing \""+node.title+"\" with id " + id);
+						id = Tumblr.edit(TMP_FILE);
+				}
         neko.FileSystem.deleteFile(TMP_FILE);
         return id;
     }
